@@ -107,10 +107,21 @@ async function currentUser(req) {
   }
 }
 
-function requireAuth(req, res, next) {
-  const user = currentUser(req);
-  if (!user) return res.status(401).json({ error: 'Please sign in first.' });
-  if (!user.verified) return res.status(403).json({ error: 'Please verify your account first.' });
+async function requireAuth(req, res, next) {
+  const user = await currentUser(req);
+
+  if (!user) {
+    return res.status(401).json({
+      error: 'Please sign in first.'
+    });
+  }
+
+  if (!user.verified) {
+    return res.status(403).json({
+      error: 'Please verify your account first.'
+    });
+  }
+
   req.user = user;
   next();
 }
