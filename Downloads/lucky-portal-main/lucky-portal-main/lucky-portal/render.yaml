@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: lucky-portal
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: node server/index.js
+    healthCheckPath: /api/health
+    # A persistent disk needs a paid plan. On the free plan data/db.json lives on
+    # ephemeral storage and is wiped on every deploy or restart. To keep data,
+    # upgrade the plan and add:
+    #   disk:
+    #     name: lucky-portal-data
+    #     mountPath: /var/data
+    #     sizeGB: 1
+    #   envVars: DATA_DIR=/var/data
+    envVars:
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false

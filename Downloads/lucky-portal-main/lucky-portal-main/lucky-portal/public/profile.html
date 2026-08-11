@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lucky Portal · Your details</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍀</text></svg>" />
+</head>
+<body>
+  <div class="page">
+    <header class="glass topbar">
+      <div class="brand"><span class="dot"></span> Lucky Portal</div>
+      <nav class="nav">
+        <a href="/welcome.html" data-nav="welcome">Welcome</a>
+        <a href="/profile.html" data-nav="profile">Profile</a>
+        <a href="/games.html" data-nav="games">Arcade</a>
+        <a href="/feedback.html" data-nav="feedback">Feedback</a>
+        <a href="#" data-logout>Logout</a>
+      </nav>
+      <button class="btn ghost small" data-theme-toggle type="button">Light mode</button>
+    </header>
+
+    <section class="glass card fade-in">
+      <h1>Personal information</h1>
+      <p class="lead">Four quick steps and your profile is ready. Fields marked * are required.</p>
+
+      <div class="stepper" id="stepper"></div>
+      <div id="alertBox" class="alert hidden"></div>
+
+      <form id="profileForm">
+        <div class="step" data-step="0">
+          <div class="grid two">
+            <div class="field"><label for="fullName">Full name *</label><input id="fullName" required placeholder="Lucky Kumar" /></div>
+            <div class="field"><label for="fatherName">Father's name</label><input id="fatherName" placeholder="Father's full name" /></div>
+            <div class="field"><label for="motherName">Mother's name</label><input id="motherName" placeholder="Mother's full name" /></div>
+            <div class="field"><label for="dob">Date of birth *</label><input id="dob" type="date" required /></div>
+            <div class="field"><label for="age">Age</label><input id="age" type="number" min="1" max="120" readonly placeholder="auto" /></div>
+            <div class="field"><label for="gender">Gender</label>
+              <select id="gender"><option value="">Prefer not to say</option><option>Female</option><option>Male</option><option>Other</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="step hidden" data-step="1">
+          <div class="grid two">
+            <div class="field"><label for="qualification">Highest qualification</label>
+              <select id="qualification">
+                <option value="">Select</option><option>School student</option><option>Higher secondary</option>
+                <option>Diploma</option><option>Undergraduate</option><option>Postgraduate</option><option>Doctorate</option>
+              </select>
+            </div>
+            <div class="field"><label for="occupation">Current status</label>
+              <select id="occupation">
+                <option value="">Select</option><option>Student</option><option>Working professional</option>
+                <option>Self employed</option><option>Job seeker</option><option>Homemaker</option><option>Retired</option>
+              </select>
+            </div>
+            <div class="field"><label for="institution">College / company</label><input id="institution" placeholder="Where do you study or work" /></div>
+            <div class="field"><label for="maritalStatus">Marital status</label>
+              <select id="maritalStatus"><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select>
+            </div>
+            <div class="field"><label for="city">City</label><input id="city" placeholder="Chennai" /></div>
+            <div class="field"><label for="phone">Mobile number</label><input id="phone" placeholder="+919876543210" /></div>
+          </div>
+        </div>
+
+        <div class="step hidden" data-step="2">
+          <div class="grid two">
+            <div class="field"><label for="contactEmail">Contact email</label><input id="contactEmail" type="email" placeholder="you@example.com" /></div>
+            <div class="field"><label for="facebook">Facebook</label><input id="facebook" placeholder="facebook.com/username" /></div>
+            <div class="field"><label for="instagram">Instagram</label><input id="instagram" placeholder="@username" /></div>
+            <div class="field"><label for="linkedin">LinkedIn</label><input id="linkedin" placeholder="linkedin.com/in/username" /></div>
+            <div class="field"><label for="twitter">X / Twitter</label><input id="twitter" placeholder="@username" /></div>
+          </div>
+        </div>
+
+        <div class="step hidden" data-step="3">
+          <div class="field">
+            <label>Hobbies (tap to pick, add your own below)</label>
+            <div class="chips" id="hobbyChips"></div>
+          </div>
+          <div class="field"><label for="hobbies">Hobbies</label><input id="hobbies" placeholder="Reading, cricket, cooking" /></div>
+          <div class="field"><label for="extraCurricular">Extra curricular activities</label><textarea id="extraCurricular" placeholder="NSS volunteer, college choir, hackathons..."></textarea></div>
+          <div class="field"><label for="about">Something about you</label><textarea id="about" placeholder="A few lines about yourself"></textarea></div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:18px">
+          <button type="button" class="btn secondary" id="prevBtn">Back</button>
+          <button type="button" class="btn" id="nextBtn">Next</button>
+          <button type="submit" class="btn hidden" id="saveBtn">Save and continue</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/profile.js"></script>
+</body>
+</html>
