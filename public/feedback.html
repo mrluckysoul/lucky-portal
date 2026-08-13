@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lucky Portal · Feedback</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>" />
+</head>
+<body>
+  <div class="page">
+    <header class="glass topbar">
+      <div class="brand"><span class="dot"></span> Lucky Portal</div>
+      <nav class="nav">
+        <a href="/welcome.html" data-nav="welcome">Welcome</a>
+        <a href="/profile.html" data-nav="profile">Profile</a>
+        <a href="/games.html" data-nav="games">Arcade</a>
+        <a href="/feedback.html" data-nav="feedback">Feedback</a>
+        <a href="#" data-logout>Logout</a>
+      </nav>
+      <button class="btn ghost small" data-theme-toggle type="button">Light mode</button>
+    </header>
+
+    <div class="grid two">
+      <section class="glass card fade-in">
+        <h1>Tell us what you think 💬</h1>
+        <p class="lead">Your rating and notes help improve the portal.</p>
+        <div id="alertBox" class="alert hidden"></div>
+        <form id="feedbackForm">
+          <div class="field">
+            <label>Rating</label>
+            <div class="stars" id="stars"></div>
+          </div>
+          <div class="field">
+            <label for="category">What is it about?</label>
+            <select id="category">
+              <option value="general">General</option>
+              <option value="design">Design and styling</option>
+              <option value="games">Games</option>
+              <option value="signup">Signup / OTP</option>
+              <option value="bug">Bug report</option>
+              <option value="idea">Feature idea</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="message">Your feedback</label>
+            <textarea id="message" placeholder="What did you like? What should change?" required></textarea>
+          </div>
+          <button class="btn" type="submit">Send feedback</button>
+        </form>
+      </section>
+
+      <section class="glass card fade-in">
+        <h2>Recent feedback</h2>
+        <ul class="list" id="feedbackList"><li class="muted">Loading…</li></ul>
+      </section>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/feedback.js"></script>
+</body>
+</html>

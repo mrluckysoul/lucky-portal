@@ -1,0 +1,21 @@
+{
+  "name": "lucky-portal",
+  "version": "1.0.0",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node test/smoke.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": "Glassmorphism portal with OTP auth, profile onboarding, mini arcade and feedback",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^9.0.5"
+  }
+}
