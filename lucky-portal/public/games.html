@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lucky Portal · Arcade</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+</head>
+<body>
+  <div class="page">
+    <header class="glass topbar">
+      <div class="brand"><span class="dot"></span> Lucky Portal</div>
+      <nav class="nav">
+        <a href="/welcome.html" data-nav="welcome">Welcome</a>
+        <a href="/profile.html" data-nav="profile">Profile</a>
+        <a href="/games.html" data-nav="games">Arcade</a>
+        <a href="/feedback.html" data-nav="feedback">Feedback</a>
+        <a href="#" data-logout>Logout</a>
+      </nav>
+      <button class="btn ghost small" data-theme-toggle type="button">Light mode</button>
+    </header>
+
+    <section class="glass card fade-in" style="margin-bottom:20px">
+      <h1>Mini arcade 🎮</h1>
+      <p class="lead">Six games, one place. Your best score for each game goes to the leaderboard.</p>
+    </section>
+
+    <div class="grid three" id="gameMenu">
+      <div class="glass game-tile" data-game="tictactoe"><div class="emoji">❌⭕</div><h2>Tic Tac Toe</h2><p class="muted">Beat the computer on a 3×3 board.</p></div>
+      <div class="glass game-tile" data-game="guess"><div class="emoji">🔢</div><h2>Guess the number</h2><p class="muted">Find the secret number in as few tries as you can.</p></div>
+      <div class="glass game-tile" data-game="memory"><div class="emoji">🧠</div><h2>Memory match</h2><p class="muted">Flip and match all eight emoji pairs.</p></div>
+      <div class="glass game-tile" data-game="rps"><div class="emoji">✊✋✌️</div><h2>Rock paper scissors</h2><p class="muted">First to five points wins the round.</p></div>
+      <div class="glass game-tile" data-game="mole"><div class="emoji">🐹</div><h2>Whack a mole</h2><p class="muted">30 seconds of fast tapping fun.</p></div>
+      <div class="glass game-tile" data-game="typing"><div class="emoji">⌨️</div><h2>Typing speed</h2><p class="muted">How many words per minute can you hit?</p></div>
+    </div>
+
+    <section class="glass card fade-in hidden" id="gameStage" style="margin-top:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <h2 id="gameTitle">Game</h2>
+        <div style="display:flex;gap:10px">
+          <button class="btn secondary small" id="restartBtn" type="button">Restart</button>
+          <button class="btn ghost small" id="exitBtn" type="button">Back to arcade</button>
+        </div>
+      </div>
+      <div id="gameBody"></div>
+    </section>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/games.js"></script>
+</body>
+</html>

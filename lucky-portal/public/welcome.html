@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lucky Portal · Welcome</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍀</text></svg>" />
+</head>
+<body>
+  <div class="page">
+    <header class="glass topbar">
+      <div class="brand"><span class="dot"></span> Lucky Portal</div>
+      <nav class="nav">
+        <a href="/welcome.html" data-nav="welcome">Welcome</a>
+        <a href="/profile.html" data-nav="profile">Profile</a>
+        <a href="/games.html" data-nav="games">Arcade</a>
+        <a href="/feedback.html" data-nav="feedback">Feedback</a>
+        <a href="#" data-logout>Logout</a>
+      </nav>
+      <button class="btn ghost small" data-theme-toggle type="button">Light mode</button>
+    </header>
+
+    <section class="glass card fade-in" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+      <div class="avatar" id="avatar">?</div>
+      <div style="flex:1;min-width:220px">
+        <h1 id="greeting">Welcome!</h1>
+        <p class="lead" id="subGreeting">Great to see you here.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn small" href="/games.html">Play games 🎮</a>
+        <a class="btn secondary small" href="/profile.html">Edit profile</a>
+      </div>
+    </section>
+
+    <div class="grid two" style="margin-top:20px">
+      <section class="glass card fade-in">
+        <h2>Your details</h2>
+        <dl class="kv" id="details"></dl>
+      </section>
+
+      <div class="grid" style="align-content:start">
+        <section class="glass card fade-in">
+          <h2>Profile strength</h2>
+          <p class="muted" id="strengthText">Calculating…</p>
+          <div style="height:12px;border-radius:999px;background:rgba(255,255,255,.16);overflow:hidden">
+            <div id="strengthBar" style="height:100%;width:0;background:linear-gradient(135deg,var(--accent),var(--accent-2));transition:width .6s ease"></div>
+          </div>
+        </section>
+        <section class="glass card fade-in">
+          <h2>Arcade leaderboard 🏆</h2>
+          <ul class="list" id="leaderboard"><li class="muted">No scores yet — be the first!</li></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/welcome.js"></script>
+</body>
+</html>
