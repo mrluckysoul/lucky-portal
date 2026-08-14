@@ -72,11 +72,7 @@ async function deliverOtp(user, code, minutes) {
     expiresInMinutes: minutes
   };
 }
-  const channels = results.filter((r) => r.delivered).map((r) => r.channel);
-  const payload = { channels, expiresInMinutes: minutes };
-  // In dev (no provider configured) the code is echoed so the flow stays testable.
-  return payload;
-}
+ 
 
 app.get('/api/config', (req, res) => {
   res.json({
