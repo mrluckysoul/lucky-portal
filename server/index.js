@@ -68,8 +68,23 @@ app.post('/api/auth/signup', asyncRoute(async (req, res) => {
     await db.saveUser(existing);
   }
   const { code, minutes } = await auth.issueOtp(user);
-  const delivery = await deliverOtp(user, code, minutes);
-  res.json({ email: user.email, needsVerification: true, ...delivery });
+
+// Send OTP in background
+deliverOtp(user, code, minutes)
+  .then((delivery) => {
+    console.log('[OTP SENT]', delivery);
+  })
+  .catch((err) => {
+    console.error('[OTP DELIVERY ERROR]', err);
+  });
+
+// Immediately send response to frontend
+res.json({
+  email: user.email,
+  needsVerification: true,
+  channels: [],
+  expiresInMinutes: minutes
+});
 }));
 
 app.post('/api/auth/signin', asyncRoute(async (req, res) => {
