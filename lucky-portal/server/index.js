@@ -22,24 +22,57 @@ function isEmail(value) {
 
 async function deliverOtp(user, code, minutes) {
   const results = [];
-  results.push(await notify.sendEmailOtp(user.email, code, minutes).catch((err) => ({
-    delivered: false,
-    channel: 'email',
-    reason: err.message
-  })));
-  if (user.phone) {
-    results.push(await notify.sendSmsOtp(user.phone, code, minutes).catch((err) => ({
+
+  try {
+    const emailResult = await notify.sendEmailOtp(
+      user.email,
+      code,
+      minutes
+    );
+    results.push(emailResult);
+  } catch (err) {
+    console.error('[EMAIL OTP ERROR]', err.message);
+    results.push({
       delivered: false,
-      channel: 'sms',
+      channel: 'email',
       reason: err.message
-    })));
+    });
   }
-  const channels = results.filter((r) => r.delivered).map((r) => r.channel);
-  const payload = { channels, expiresInMinutes: minutes };
-  // In dev (no provider configured) the code is echoed so the flow stays testable.
-  if (channels.length === 0) payload.devCode = code;
-  return payload;
+
+  if (user.phone) {
+    try {
+      const smsResult = await notify.sendSmsOtp(
+        user.phone,
+        code,
+        minutes
+      );
+      results.push(smsResult);
+    } catch (err) {
+      console.error('[SMS OTP ERROR]', err.message);
+      results.push({
+        delivered: false,
+        channel: 'sms',
+        reason: err.message
+      });
+    }
+  }
+
+  const channels = results
+    .filter((r) => r.delivered)
+    .map((r) => r.channel);
+
+  console.log('[OTP DELIVERY]', {
+    email: user.email,
+    channels,
+    results
+  });
+
+  return {
+    channels,
+    expiresInMinutes: minutes
+  };
 }
+ 
 
 app.get('/api/config', (req, res) => {
   res.json({
