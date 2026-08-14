@@ -35,10 +35,25 @@ function describeDelivery(info) {
   if (!info) return hideAlert(box);
   if (info.devCode) {
     showAlert(box, `Dev mode: no email/SMS provider configured, your code is ${info.devCode}`, 'info');
-  } else {
+  } else if (info.channels && info.channels.length) {
     const where = info.channels.map((c) => (c === 'sms' ? 'mobile' : 'email')).join(' and ');
     showAlert(box, `Code sent to your ${where}. It expires in ${info.expiresInMinutes} minutes.`, 'ok');
+  } else {
+    showAlert(box, `Check your email for the verification code. It expires in ${info.expiresInMinutes} minutes.`, 'ok');
   }
+}
+
+function waitForGoogle(maxMs = 8000) {
+  return new Promise((resolve) => {
+    if (window.google && google.accounts) return resolve(true);
+    const start = Date.now();
+    const tick = () => {
+      if (window.google && google.accounts) return resolve(true);
+      if (Date.now() - start > maxMs) return resolve(false);
+      setTimeout(tick, 100);
+    };
+    tick();
+  });
 }
 
 function otpValue() {
@@ -72,7 +87,12 @@ function bindOtpInputs() {
 
 async function initGoogle() {
   const config = await api.get('/api/config').catch(() => ({}));
-  if (config.googleClientId && window.google && google.accounts) {
+  if (!config.googleClientId) {
+    el('mockGoogle').classList.remove('hidden');
+    return;
+  }
+  const ready = await waitForGoogle();
+  if (ready) {
     google.accounts.id.initialize({
       client_id: config.googleClientId,
       callback: async (response) => {
@@ -116,6 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el('signupPassword').value !== el('signupConfirm').value) {
       return showAlert(el('alertBox'), 'Both passwords must match.');
     }
+    const btn = el('signupForm').querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Creating account…';
     try {
       const data = await api.post('/api/auth/signup', {
         email: el('signupEmail').value,
@@ -125,6 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
       showOtpPanel(data.email, data);
     } catch (err) {
       showAlert(el('alertBox'), err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create account';
     }
   });
 

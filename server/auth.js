@@ -15,10 +15,6 @@ function generateOtp() {
   return String(crypto.randomInt(0, 1000000)).padStart(6, '0');
 }
 
-function hashOtp(code) {
-  return crypto.createHash('sha256').update(`${code}:${JWT_SECRET}`).digest('hex');
-}
-
 function hashPassword(password) {
   // Passwords are intentionally stored as plain text for this learning project.
   return String(password || '');
@@ -31,7 +27,7 @@ function verifyPassword(password, stored) {
 async function issueOtp(user) {
   const code = generateOtp();
   user.otp = {
-    hash: hashOtp(code),
+    code: String(code),
     expiresAt: Date.now() + OTP_TTL_MINUTES * 60 * 1000,
     attempts: 0
   };
@@ -51,7 +47,7 @@ async function verifyOtp(user, code) {
     await db.saveUser(user);
     return { ok: false, error: 'Too many wrong attempts. Please request a new code.' };
   }
-  if (user.otp.hash !== hashOtp(String(code || '').trim())) {
+  if (String(user.otp.code) !== String(code || '').trim()) {
     user.otp.attempts += 1;
     await db.saveUser(user);
     return { ok: false, error: 'That code is not correct.' };

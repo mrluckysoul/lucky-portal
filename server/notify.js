@@ -10,8 +10,8 @@ function transport() {
   if (!cachedTransport) {
     cachedTransport = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-   port: Number(process.env.SMTP_PORT || 465),
-secure: true,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: String(process.env.SMTP_SECURE || 'false') === 'true',
       auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
     });
   }
@@ -34,14 +34,20 @@ async function sendEmailOtp(to, code, minutes) {
     console.log(`[dev-email] OTP for ${to}: ${code}`);
     return { delivered: false, channel: 'email', reason: 'smtp-not-configured' };
   }
-  await transport().sendMail({
-    from: process.env.MAIL_FROM || `Lucky Portal <${process.env.SMTP_USER}>`,
-    to,
-    subject: `${code} is your Lucky Portal verification code`,
-    text: `Your Lucky Portal verification code is ${code}. It expires in ${minutes} minutes.`,
-    html: otpEmailHtml(code, minutes)
-  });
-  return { delivered: true, channel: 'email' };
+  try {
+    await transport().sendMail({
+      from: process.env.MAIL_FROM || `Lucky Portal <${process.env.SMTP_USER}>`,
+      to,
+      subject: `${code} is your Lucky Portal verification code`,
+      text: `Your Lucky Portal verification code is ${code}. It expires in ${minutes} minutes.`,
+      html: otpEmailHtml(code, minutes)
+    });
+    console.log(`[EMAIL OTP] Sent to ${to}`);
+    return { delivered: true, channel: 'email' };
+  } catch (err) {
+    console.error('[EMAIL OTP ERROR]', err.message);
+    throw err;
+  }
 }
 
 function smsConfigured() {

@@ -61,30 +61,30 @@ app.post('/api/auth/signup', asyncRoute(async (req, res) => {
   const existing = await db.findUserByEmail(email);
   if (existing && existing.verified) return res.status(409).json({ error: 'That email is already registered. Please sign in.' });
 
-  const user = existing || await auth.createUser({ email, password, phone });
-  if (existing) {
-    existing.password = String(password);
-    existing.phone = phone ? String(phone).trim() : existing.phone;
-    await db.saveUser(existing);
+  let user = existing;
+  if (user) {
+    user.password = String(password);
+    user.phone = phone ? String(phone).trim() : user.phone;
+  } else {
+    user = await auth.createUser({ email, password, phone });
   }
   const { code, minutes } = await auth.issueOtp(user);
 
-// Send OTP in background
-deliverOtp(user, code, minutes)
-  .then((delivery) => {
-    console.log('[OTP SENT]', delivery);
-  })
-  .catch((err) => {
-    console.error('[OTP DELIVERY ERROR]', err);
-  });
+  const payload = {
+    email: user.email,
+    needsVerification: true,
+    expiresInMinutes: minutes,
+    channels: []
+  };
+  if (notify.emailConfigured()) payload.channels.push('email');
+  if (user.phone && notify.smsConfigured()) payload.channels.push('sms');
+  if (payload.channels.length === 0) payload.devCode = code;
 
-// Immediately send response to frontend
-res.json({
-  email: user.email,
-  needsVerification: true,
-  channels: [],
-  expiresInMinutes: minutes
-});
+  deliverOtp(user, code, minutes)
+    .then((delivery) => console.log('[OTP SENT]', delivery))
+    .catch((err) => console.error('[OTP DELIVERY ERROR]', err));
+
+  res.json(payload);
 }));
 
 app.post('/api/auth/signin', asyncRoute(async (req, res) => {
