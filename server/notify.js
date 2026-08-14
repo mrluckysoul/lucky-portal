@@ -1,21 +1,5 @@
-const nodemailer = require('nodemailer');
-
-let cachedTransport = null;
-
 function emailConfigured() {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
-}
-
-function transport() {
-  if (!cachedTransport) {
-    cachedTransport = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: String(process.env.SMTP_SECURE || 'false') === 'true',
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-    });
-  }
-  return cachedTransport;
+  return Boolean(process.env.RESEND_API_KEY);
 }
 
 function otpEmailHtml(code, minutes) {
@@ -32,18 +16,47 @@ function otpEmailHtml(code, minutes) {
 async function sendEmailOtp(to, code, minutes) {
   if (!emailConfigured()) {
     console.log(`[dev-email] OTP for ${to}: ${code}`);
-    return { delivered: false, channel: 'email', reason: 'smtp-not-configured' };
+    return {
+      delivered: false,
+      channel: 'email',
+      reason: 'resend-not-configured'
+    };
   }
+
   try {
-    await transport().sendMail({
-      from: process.env.MAIL_FROM || `Lucky Portal <${process.env.SMTP_USER}>`,
-      to,
-      subject: `${code} is your Lucky Portal verification code`,
-      text: `Your Lucky Portal verification code is ${code}. It expires in ${minutes} minutes.`,
-      html: otpEmailHtml(code, minutes)
+    const from =
+      process.env.MAIL_FROM || 'Lucky Portal <onboarding@resend.dev>';
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from,
+        to: [to],
+        subject: `${code} is your Lucky Portal verification code`,
+        text: `Your Lucky Portal verification code is ${code}. It expires in ${minutes} minutes.`,
+        html: otpEmailHtml(code, minutes)
+      })
     });
-    console.log(`[EMAIL OTP] Sent to ${to}`);
-    return { delivered: true, channel: 'email' };
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        `Resend error ${response.status}: ${data.message || JSON.stringify(data)}`
+      );
+    }
+
+    console.log(`[EMAIL OTP] Sent to ${to}`, data);
+
+    return {
+      delivered: true,
+      channel: 'email',
+      id: data.id
+    };
   } catch (err) {
     console.error('[EMAIL OTP ERROR]', err.message);
     throw err;
@@ -54,39 +67,75 @@ function smsConfigured() {
   return Boolean(
     process.env.TWILIO_ACCOUNT_SID &&
       process.env.TWILIO_AUTH_TOKEN &&
-      (process.env.TWILIO_FROM_NUMBER || process.env.TWILIO_MESSAGING_SERVICE_SID)
+      (process.env.TWILIO_FROM_NUMBER ||
+        process.env.TWILIO_MESSAGING_SERVICE_SID)
   );
 }
 
 async function sendSmsOtp(phone, code, minutes) {
-  if (!phone) return { delivered: false, channel: 'sms', reason: 'no-phone' };
+  if (!phone) {
+    return {
+      delivered: false,
+      channel: 'sms',
+      reason: 'no-phone'
+    };
+  }
+
   if (!smsConfigured()) {
     console.log(`[dev-sms] OTP for ${phone}: ${code}`);
-    return { delivered: false, channel: 'sms', reason: 'twilio-not-configured' };
+    return {
+      delivered: false,
+      channel: 'sms',
+      reason: 'twilio-not-configured'
+    };
   }
+
   const sid = process.env.TWILIO_ACCOUNT_SID;
+
   const body = new URLSearchParams({
     To: phone,
     Body: `${code} is your Lucky Portal verification code. It expires in ${minutes} minutes.`
   });
+
   if (process.env.TWILIO_MESSAGING_SERVICE_SID) {
-    body.set('MessagingServiceSid', process.env.TWILIO_MESSAGING_SERVICE_SID);
+    body.set(
+      'MessagingServiceSid',
+      process.env.TWILIO_MESSAGING_SERVICE_SID
+    );
   } else {
     body.set('From', process.env.TWILIO_FROM_NUMBER);
   }
-  const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-    method: 'POST',
-    headers: {
-      Authorization: 'Basic ' + Buffer.from(`${sid}:${process.env.TWILIO_AUTH_TOKEN}`).toString('base64'),
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body
-  });
+
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization:
+          'Basic ' +
+          Buffer.from(
+            `${sid}:${process.env.TWILIO_AUTH_TOKEN}`
+          ).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body
+    }
+  );
+
   if (!response.ok) {
     const detail = await response.text();
     throw new Error(`Twilio error ${response.status}: ${detail}`);
   }
-  return { delivered: true, channel: 'sms' };
+
+  return {
+    delivered: true,
+    channel: 'sms'
+  };
 }
 
-module.exports = { sendEmailOtp, sendSmsOtp, emailConfigured, smsConfigured };
+module.exports = {
+  sendEmailOtp,
+  sendSmsOtp,
+  emailConfigured,
+  smsConfigured
+};
